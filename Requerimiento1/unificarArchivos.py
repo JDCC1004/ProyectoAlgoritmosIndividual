@@ -33,8 +33,8 @@ print(f"Bases de datos unificadas en:  {basesUnificadas}")
 entradasUnicas = {}
 entradasRepetidas = {}
 
-patronISBN = re.compile(r"isbn\s*=\s*\{([^}]+)\}", re.IGNORECASE)
-patronDOI = re.compile(r"doi\s*=\s*\{([^}]+)\}", re.IGNORECASE)
+patronTitulo = re.compile(r"title\s*=\s*\{([^}]+)\}", re.IGNORECASE)
+
 
 with open(basesUnificadas, "r", encoding="utf-8") as entrada:
     contenido = entrada.read()
@@ -47,15 +47,15 @@ with open(basesUnificadas, "r", encoding="utf-8") as entrada:
         if not entrada:
             continue
 
-        isbn = patronISBN.search(entrada)
-        doi = patronDOI.search(entrada)
-        identificador = isbn.group(1) if isbn else doi.group(1) if doi else None
+        coincidenciaTitulo = patronTitulo.search(entrada)
+        titulo = coincidenciaTitulo.group(1).strip() if coincidenciaTitulo else None
 
-        if identificador:
-            if identificador in entradasUnicas:
-                entradasRepetidas[identificador] = entrada
+        if titulo:
+            tituloNormalizado = titulo.lower()
+            if tituloNormalizado in entradasUnicas:
+                entradasRepetidas[tituloNormalizado] = entrada
             else:
-                entradasUnicas[identificador] = entrada
+                entradasUnicas[tituloNormalizado] = entrada
         else:
             claveGenerica = f"Unica_{len(entradasUnicas) + 1}"
             entradasUnicas[claveGenerica] = entrada
