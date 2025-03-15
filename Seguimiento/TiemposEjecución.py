@@ -6,7 +6,7 @@ import bibtexparser
 
 from MetodosOrdenamiento import MetodosOrdenamiento
 
-sys.setrecursionlimit(10000)
+sys.setrecursionlimit(5000)
 
 ruta = os.path.join(os.path.dirname(os.path.dirname(__file__)), "Data", "BasesUnificadas.bib")
 
@@ -54,40 +54,40 @@ def analizarColumna(columnaNombre, entradasBIB):
     for entrada in entradasBIB:
         valorCelda = entrada.get(columnaNombre, '').strip()
 
-        if columnaNombre == 'author':
-            if valorCelda and valorCelda not in ['N/A', 'NULL']:
+        if valorCelda and valorCelda not in ['N/A', 'NULL']:
+            if columnaNombre == 'author':
                 primerAutor = valorCelda.split(' and ')[0].strip()
                 if primerAutor:
                     arregloColumna.append(primerAutor)
-
-        elif columnaNombre in columnasNumericas and valorCelda.isdigit():
-                arregloColumna.append(int(valorCelda))
-
-        else:
-            if valorCelda and valorCelda not in ['N/A', 'NULL']:
+            else:
                 arregloColumna.append(valorCelda)
 
     if columnaNombre in columnasNumericas:
-        arregloColumna = [x for x in arregloColumna if isinstance(x, int)]
+        arregloColumna = [x for x in arregloColumna if x.isdigit()]
+        arregloColumna = list(map(int, arregloColumna))
         MetodosOrdenamiento = metodosNumericos
     else:
-        if columnaNombre == 'author':
-            arregloColumna = [sum(convertirAscii(x) for x in arregloColumna)]
-            MetodosOrdenamiento = metodosNumericos
-        else:
-            MetodosOrdenamiento = metodosTexto
+        arregloColumna = sorted(arregloColumna, key=str.lower)
+        MetodosOrdenamiento = metodosTexto
 
     for metodos in MetodosOrdenamiento:
+
+        print(f"Ordenando {len(arregloColumna)} elementos usando {metodos.__name__}")
+
         inicioTiempo = time.time()
 
-        arregloOrdenado = metodos(arregloColumna[:])
+        try:
+            arregloOrdenado = metodos(arregloColumna[:])
+        except Exception as e:
+            print(f"Error al ejecutar {metodos.__name__}: {e}")
+            continue
 
         finalTiempo = time.time()
-        timepoTotal = finalTiempo - inicioTiempo
+        tiempoTotal = finalTiempo - inicioTiempo
 
-        print(timepoTotal)
+        print(f"Tiempo de ejecución para {metodos.__name__}: {tiempoTotal:.6f} segundos")
 
-        resultados.append((columnaNombre, metodos.__name__, len(arregloColumna),timepoTotal))
+        resultados.append((columnaNombre, metodos.__name__, len(arregloColumna),tiempoTotal))
 
     return resultados
 
