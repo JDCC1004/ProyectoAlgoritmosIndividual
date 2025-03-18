@@ -29,69 +29,43 @@ class MetodosOrdenamiento:
             arreglo[i], arreglo[minIndex] = arreglo[minIndex], arreglo[i]
         return arreglo
 
-
-    class Node:
-        def __init__(self, value):
-            self.left = None
-            self.right = None
-            self.value = value
-
-    def insert(self, root, value):
-        if root is None:
-            return self.Node(value)
-        else:
-            if value < root.value:
-                root.left = self.insert(root.left, value)
-            else:
-                root.right = self.insert(root.right, value)
-        return root
-
-    def inorder(self, root, resultado):
-        if root:
-            self.inorder(root.left, resultado)
-            resultado.append(root.value)
-            self.inorder(root.right, resultado)
-
-    def treeSort(self, arreglo):
-        if len(arreglo) == 0:
-            return []
-        root = self.treeSort(arreglo[0])
-        for i in range(1, len(arreglo)):
-            self.insert(root, arreglo[i])
-        resultado = []
-        self.inorder(root, resultado)
-        return resultado
-
     def pigeonholeSort(self, arreglo):
+
         minValue = min(arreglo)
         maxValue = max(arreglo)
         size = maxValue - minValue + 1
-        holes = [0] * size
+        holes = [[] for _ in range(size)]
+
         for x in arreglo:
-            holes[x - minValue] += 1
-        sorted_arreglo = []
-        for i in range(size):
-            while holes[i] > 0:
-                sorted_arreglo.append(i - minValue)
-                holes[i] -= 1
-        return sorted_arreglo
+            holes[x - minValue].append(x)
+
+        sortedArreglo = []
+        for hole in holes:
+            sortedArreglo.extend(hole)
+
+        return sortedArreglo
 
     def bucketSort(self, arreglo):
-        if len(arreglo) == 0:
-            return arreglo
-        bucketsCount = 10
-        maxValue = max(arreglo)
-        buckets = [[] for _ in range(bucketsCount)]
-        for number in arreglo:
-            index = int(number / (maxValue / bucketsCount))
-            if index >= bucketsCount:
-                index = bucketsCount - 1
-            buckets[index].append(number)
 
-        sorted_arreglo = []
+        maxValue = max(arreglo)
+        minValue = min(arreglo)
+        rango = maxValue - minValue + 1
+        numBuckets = len(arreglo) // 10 + 1
+        buckets = [[] for _ in range(numBuckets)]
+
+        for num in arreglo:
+            index = (num - minValue) * numBuckets // rango
+            buckets[index].append(num)
+
         for bucket in buckets:
-            sorted_arreglo.extend(sorted(bucket))
-        return sorted_arreglo
+            bucket.sort()
+
+        sortedArreglo = []
+
+        for bucket in buckets:
+            sortedArreglo.extend(sorted(bucket))
+
+        return sortedArreglo
 
     def quickSort(self, arreglo):
         if len(arreglo) <= 1:
@@ -155,23 +129,31 @@ class MetodosOrdenamiento:
 
     def binaryInsertionSort(self, arreglo):
 
-        def binarySearch(arreglo, value, start, end):
-            if start == end:
-                return start if arreglo[start] > value else start + 1
-            if start > end:
-                return start
-            mid = (start + end) // 2
-            if arreglo[mid] < value:
-                return binarySearch(arreglo, value, mid - 1, end)
-            elif arreglo[mid] > value:
-                return binarySearch(arreglo, value, start, mid - 1)
-            else:
-                return mid
-
         for i in range(1, len(arreglo)):
-            value = arreglo[i]
-            j = binarySearch(arreglo, value, 0, i - 1)
-            arreglo = arreglo[:j] + [value] + arreglo[i + 1:]
+            clave = arreglo[i]
+            izquierda, derecha = 0, i
+
+            while izquierda < derecha:
+                medio = (izquierda + derecha) // 2
+                if arreglo[medio] < clave:
+                    izquierda = medio + 1
+                else:
+                    derecha = medio
+
+            arreglo = arreglo[:izquierda] + [clave] + arreglo[izquierda:i] + arreglo[i + 1:]
+
+        return arreglo
+
+    def radixSort(self, arreglo):
+        if len(arreglo) == 0:
+            return arreglo
+
+        maxValue = max(arreglo)
+        exp = 1
+
+        while maxValue // exp > 0:
+            arreglo = self.countingSort(arreglo, exp)
+            exp *= 10
         return arreglo
 
     def countingSort(self, arreglo, exp):
@@ -179,28 +161,47 @@ class MetodosOrdenamiento:
         output = [0] * n
         count = [0] * 10
 
-        for i in range(n):
-            index = (arreglo[i] // exp) % 10
+        for i in arreglo:
+            index = (i // exp) % 10
             count[index] += 1
 
         for i in range(1, 10):
             count[i] += count[i - 1]
 
-        i = n - 1
-        while i >= 0:
+        for i in range(n - 1, -1, -1):
             index = (arreglo[i] // exp) % 10
             output[count[index] - 1] = arreglo[i]
             count[index] -= 1
-            i -= 1
 
-        for i in range(len(arreglo)):
-            arreglo[i] = output[i]
+        return output
 
-    def radixSort(self, arreglo):
-        maxNum = max(arreglo)
+    @staticmethod
+    def treeSort(arreglo):
+        class Node:
+            def __init__(self, key):
+                self.value = key
+                self.left = None
+                self.right = None
 
-        exp = 1
-        while maxNum // exp > 0:
-            self.countingSort(arreglo, exp)
-            exp *= 10
-        return arreglo
+        def insert(root, key):
+            if root is None:
+                return Node(key)
+            elif key < root.value:
+                root.left = insert(root.left, key)
+            elif key > root.value:
+                root.right = insert(root.right, key)
+            return root
+
+        def inorderTraversal(root, sortedArreglo):
+            if root:
+                inorderTraversal(root.left, sortedArreglo)
+                sortedArreglo.append(root.value)
+                inorderTraversal(root.right, sortedArreglo)
+
+        root = None
+        for key in arreglo:
+            root = insert(root, key)
+
+        sortedArreglo = []
+        inorderTraversal(root, sortedArreglo)
+        return sortedArreglo

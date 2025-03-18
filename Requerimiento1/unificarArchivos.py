@@ -34,7 +34,11 @@ entradasUnicas = {}
 entradasRepetidas = {}
 
 patronTitulo = re.compile(r"title\s*=\s*\{([^}]+)\}", re.IGNORECASE)
-
+patronISBN = re.compile(r"isbn\s*=\s*\{([^}]+)\}", re.IGNORECASE)
+patronDOI = re.compile(r"doi\s*=\s*\{([^}]+)\}", re.IGNORECASE)
+patronVolumen = re.compile(r"volume\s*=\s*\{([^}]+)\}", re.IGNORECASE)
+patronAutor = re.compile(r"author\s*=\s*\{([^}]+)\}", re.IGNORECASE)
+patronAnio = re.compile(r"year\s*=\s*\{([^}]+)\}", re.IGNORECASE)
 
 with open(basesUnificadas, "r", encoding="utf-8") as entrada:
     contenido = entrada.read()
@@ -47,18 +51,28 @@ with open(basesUnificadas, "r", encoding="utf-8") as entrada:
         if not entrada:
             continue
 
-        coincidenciaTitulo = patronTitulo.search(entrada)
-        titulo = coincidenciaTitulo.group(1).strip() if coincidenciaTitulo else None
+        titulo = patronTitulo.search(entrada)
+        isbn = patronISBN.search(entrada)
+        doi = patronDOI.search(entrada)
+        volumen = patronVolumen.search(entrada)
+        autor = patronAutor.search(entrada)
+        anio = patronAnio.search(entrada)
 
-        if titulo:
-            tituloNormalizado = titulo.lower()
-            if tituloNormalizado in entradasUnicas:
-                entradasRepetidas[tituloNormalizado] = entrada
-            else:
-                entradasUnicas[tituloNormalizado] = entrada
+        titulo = titulo.group(1).strip().lower() if titulo else "N/A"
+        isbn = isbn.group(1).strip().lower() if isbn else "N/A"
+        doi = doi.group(1).strip().lower() if doi else "N/A"
+        volumen = volumen.group(1).strip().lower() if volumen else "N/A"
+        autor = autor.group(1).strip().lower() if autor else "N/A"
+        anio = anio.group(1).strip().lower() if anio else "N/A"
+
+        identificador = isbn if isbn != "N/A" else doi if doi != "N/A" else "Sin ISBN/DOI"
+
+        claveUnica = f"{titulo} | {identificador} | {volumen} | {autor} | {anio}"
+
+        if claveUnica in entradasUnicas:
+            entradasRepetidas[claveUnica] = entrada
         else:
-            claveGenerica = f"Unica_{len(entradasUnicas) + 1}"
-            entradasUnicas[claveGenerica] = entrada
+            entradasUnicas[claveUnica] = entrada
 
 
 with open(basesFiltradas, "w", encoding="utf-8") as salidaFiltrada:
