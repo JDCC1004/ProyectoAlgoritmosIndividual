@@ -36,10 +36,10 @@ def iniciar_sesion(pagina):
     # Iniciar sesión con correo institucional
     pagina.locator("a#btn-google").click()
     pagina.wait_for_load_state("domcontentloaded")
-    pagina.fill("#identifierId", "pepitoperez@uqvirtual.edu.co")  # Modificar
+    pagina.fill("#identifierId", "yhonatans.gomezv@uqvirtual.edu.co")  # Modificar
     pagina.click("button:has-text('Siguiente')")
     pagina.wait_for_load_state("domcontentloaded")
-    pagina.fill("input[name='Passwd']", "UnaContraseñaMuySegura123") # Modificar
+    pagina.fill("input[name='Passwd']", "YhonatanGUQ1004916672") # Modificar
     pagina.click("button:has-text('Siguiente')")
     time.sleep(2)
     pagina.wait_for_load_state("domcontentloaded")

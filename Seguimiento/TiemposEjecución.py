@@ -8,7 +8,7 @@ from MetodosOrdenamiento import MetodosOrdenamiento
 
 sys.setrecursionlimit(10000)
 
-ruta = os.path.join(os.path.dirname(os.path.dirname(__file__)), "Data", "BasesUnificadas.bib")
+ruta = os.path.join(os.path.dirname(os.path.dirname(__file__)), "Datos", "BasesFiltradas.bib")
 
 metodos = MetodosOrdenamiento()
 

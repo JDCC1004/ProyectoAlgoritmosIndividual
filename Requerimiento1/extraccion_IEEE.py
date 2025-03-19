@@ -1,5 +1,6 @@
 import os
 import time
+import re
 
 from Requerimiento1 import automatizacion
 
@@ -10,6 +11,8 @@ def safe_click(pagina, selector):
     element.wait_for_element_state("visible")
     element.wait_for_element_state("enabled")
     element.click()
+
+
 
 def extraer_ieee (playwright, navegador, pagina):
     # Crear una nueva pestaña en el navegador
@@ -85,6 +88,7 @@ def extraer_ieee (playwright, navegador, pagina):
             except Exception as e:
                 print(f"No hay más páginas.{e}")
                 break
+
 
     except Exception as e:
         print(f"Exception: {e}")
