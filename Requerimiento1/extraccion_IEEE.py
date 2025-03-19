@@ -1,6 +1,5 @@
 import os
 import time
-import re
 
 from Requerimiento1 import automatizacion
 
