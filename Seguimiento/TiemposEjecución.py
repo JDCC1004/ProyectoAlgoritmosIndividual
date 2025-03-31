@@ -29,7 +29,8 @@ metodosTexto = [
     metodos.heapSort,
     metodos.bitonicSort,
     metodos.gnomeSort,
-    metodos.binaryInsertionSort
+    metodos.binaryInsertionSort,
+    metodos.bubbleSort()
 ]
 
 # Listado de métodos de ordenamiento para datos numéricos
