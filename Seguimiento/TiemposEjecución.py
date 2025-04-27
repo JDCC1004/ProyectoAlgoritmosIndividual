@@ -30,7 +30,7 @@ metodosTexto = [
     metodos.bitonicSort,
     metodos.gnomeSort,
     metodos.binaryInsertionSort,
-    metodos.bubbleSort()
+    metodos.bubbleSort
 ]
 
 # Listado de métodos de ordenamiento para datos numéricos
